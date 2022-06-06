@@ -255,7 +255,7 @@ class UsuarioControlador {
 				}
 			}
 		}
-		include_once 'vistas/usuario/login.php';
+		include_once 'vistas/usuario/login.php' ;
 	}
 
 }
