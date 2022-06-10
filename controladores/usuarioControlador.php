@@ -29,6 +29,26 @@ class UsuarioControlador {
 			$password = sha1($_POST['password']);
 			$imagen = null;
 
+			//Código para captcha			
+			$ip = $_SERVER['REMOTE_ADDR'];
+			$captcha = $_POST['g-recaptcha-response'];
+			$secretkey = "6Lef810gAAAAAL681MQrN2cG6X5i9-qb1A_jGrTm";
+
+			$respuesta = file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=$secretkey&response=$captcha&remoteip=$ip");
+
+			$atributos = json_decode($respuesta, TRUE);
+
+			if (!$atributos['success']) {
+				$captcha_validate = false;
+				$this->mensajes[] = [
+					"tipo" => "danger",
+					"mensaje" => "El captcha no es válido."
+				];
+				$errores["captcha"] = "El captcha no es válido.";
+			} else {
+				$nickname_validate = true;
+			}
+
 			if (!empty($_POST["nickname"]) && strlen($_POST["nickname"]) <= 20
 			) {
 				$nickname_validate = true;
@@ -114,7 +134,7 @@ class UsuarioControlador {
 				}
 			}
 			if (count($errores) == 0) {
-				$resultModelo = $this->modeloUsuarios->adduser([
+				$resultModelo = $this->modeloUsuarios->addUser([
 					'nickname' => $nickname,
 					'nombre' => $nombre,
 					'apellidos' => $apellidos,
@@ -209,7 +229,14 @@ class UsuarioControlador {
 			$nickname = filter_var($_POST["usuario"], FILTER_SANITIZE_STRING);
 			$password = sha1($_POST['password']);
 
-			if ((isset($_POST['usuario']) && isset($_POST['password'])) && (!empty($_POST['usuario']) && !empty($_POST['password']))) {
+			//Código para captcha			
+			$ip = $_SERVER['REMOTE_ADDR'];
+			$captcha = $_POST['g-recaptcha-response'];
+			$secretkey = "6Lef810gAAAAAL681MQrN2cG6X5i9-qb1A_jGrTm";
+			$respuesta = file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret=$secretkey&response=$captcha&remoteip=$ip");
+			$atributos = json_decode($respuesta, TRUE);
+
+			if ((isset($_POST['usuario']) && isset($_POST['password'])) && (!empty($_POST['usuario']) && !empty($_POST['password']) && $atributos['success'])) {
 
 				$usuario = $this->modeloUsuarios->login($nickname, $password);
 
@@ -249,13 +276,32 @@ class UsuarioControlador {
 					}
 					//Página a la que redireccionamos si se accede correctamente con nuestras credenciales
 					header("Location: index.php?controlador=usuario&accion=listarUser");
-				} else {
-					//En caso de datos incorrectos vamos a login y le pasamos por GET el error DATOS.
-					header("Location: index.php?controlador=usuario&accion=login&error=credenciales");
 				}
+			} else {
+				//En caso de datos incorrectos vamos a login y le pasamos por GET el error DATOS.
+				header("Location: index.php?controlador=usuario&accion=login&error=credenciales");
 			}
 		}
-		include_once 'vistas/usuario/login.php' ;
+		include_once 'vistas/usuario/login.php';
+	}
+
+	public function detalleUser() {
+
+		$idusuario = $_GET["id"];
+
+		try {
+			$usuarioMostrar = $this->modeloUsuarios->detalleUser($idusuario);
+
+			if ($usuarioMostrar) {
+				$mensajeResultado = '<div class="alert alert-success">' .
+						"La consulta se realizó correctamente." . '</div>';
+			}
+		} catch (PDOException $ex) {
+			$mensajeResultado = '<div class="alert alert-danger">' .
+					"La consulta no se realizó correctamente." . '</div>';
+			die();
+		}
+		include_once 'vistas/usuario/detalle.php';
 	}
 
 }
