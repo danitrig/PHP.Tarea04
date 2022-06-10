@@ -1,5 +1,5 @@
 <?php
-require_once 'includes/header.php';
+require_once 'vistas/includes/header.php';
 ?>
 
 <h2>Crear Nuevo Categoría</h2>
@@ -8,7 +8,7 @@ require_once 'includes/header.php';
 	<div class="alert alert-<?= $mensaje["tipo"] ?>"><?= $mensaje["mensaje"] ?></div>
 <?php endforeach; ?>
 
-<form action="index.php?accion=addcategoria" method="POST" enctype="multipart/form-data">
+<form action="?controlador=categoria&accion=addCategoria" method="POST" enctype="multipart/form-data">
 
 	<!-- Nombre -->
     <label for="nombre">Nombre:
@@ -21,4 +21,4 @@ require_once 'includes/header.php';
 
 </form>
 
-<?php require_once 'includes/footer.php' ?>
+<?php require_once 'vistas/includes/footer.php' ?>

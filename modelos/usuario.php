@@ -128,16 +128,26 @@ class Usuario {
 	public function login($nick, $pass) {
 
 		$sql = "SELECT * FROM usuarios where nick = '{$nick}' and password = '{$pass}'";
-		
+
 		$resultsquery = $this->conexion->query($sql);
-		
+
 		$cuenta_col = $resultsquery->rowCount();
-		
+
 		if ($cuenta_col == 1) {
 			return true;
 		} else {
 			return false;
 		}
+	}
+
+	public function detalleUser($idusuario) {
+
+		$sql = "SELECT * FROM usuarios WHERE id = '{$idusuario}'";
+
+		$resultsquery = $this->conexion->query($sql);
+		$usuarioMostrar = $resultsquery->fetch();
+
+		return $usuarioMostrar;
 	}
 
 }

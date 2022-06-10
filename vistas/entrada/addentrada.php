@@ -1,5 +1,5 @@
 <?php
-require_once 'includes/header.php';
+require_once 'vistas/includes/header.php';
 ?>
 
 <h2>Crear Nuevo Entrada</h2>
@@ -8,7 +8,7 @@ require_once 'includes/header.php';
 	<div class="alert alert-<?= $mensaje["tipo"] ?>"><?= $mensaje["mensaje"] ?></div>
 <?php endforeach; ?>
 
-<form action="index.php?accion=addentrada" method="POST" enctype="multipart/form-data">
+<form action="?controlador=entrada&accion=addEntrada" method="POST" enctype="multipart/form-data">
 
 	<!-- Título -->
     <label for="titulo">Título:
@@ -21,7 +21,19 @@ require_once 'includes/header.php';
         <input type="file" name="imagen" class="form-control" />
     </label>
     </br>
+
+	<label for="categoria">Categoría:
+		<select name="categoria">
+			<option value="">Seleccione:</option>
+			<?php foreach ($listaCategorias as $row => $fila): ?>
+				<option value="<?= $fila["id"] ?>"><?= $fila["nombre"] ?></option>
+			<?php endforeach; ?>
+		</select>    
+	</label>
+    </br>
 	
+	<input id="prodId" name="prodId" type="hidden" value="xm234jq">
+
 	<!-- Descripción -->
     <label for="descripcion">Descripción:
         <textarea name="descripcion" class="form-control"></textarea>
@@ -33,4 +45,4 @@ require_once 'includes/header.php';
 
 </form>
 
-<?php require_once 'includes/footer.php' ?>
+<?php require_once 'vistas/includes/footer.php' ?>

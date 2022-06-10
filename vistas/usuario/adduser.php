@@ -1,7 +1,12 @@
 <?php
 require_once 'vistas/includes/header.php';
 ?>
-<a href="?controlador=usuario&accion=login">Inicio de Sesión</a>
+<!-- Script para el captcha -->
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
+<a href="?controlador=usuario&accion=login">Inicio de Sesión</a></br>
+<a href="?controlador=categoria&accion=addCategoria">Añadir Categoría</a></br>
+<a href="?controlador=entrada&accion=addEntrada">Añadir Entrada al Blog</a></br>
 
 <h2>Crear Nuevo Usuario</h2>
 
@@ -46,6 +51,12 @@ require_once 'vistas/includes/header.php';
         <input type="file" name="imagen" class="form-control" />
     </label>
     </br>
+
+	<!-- Captcha -->
+	<label for="captcha">Captcha: 
+		<div class="g-recaptcha" name= "captcha" data-sitekey="6Lef810gAAAAAChSMQBkS0o4FVLn7TE_Q_iwRo62"></div>
+	</label>
+	<br/>
 
     <input type="submit" value="Enviar" name="submit" class="btn btn-success" />
 
