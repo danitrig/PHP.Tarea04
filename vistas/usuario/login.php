@@ -1,6 +1,9 @@
 <?php
 require_once 'vistas/includes/header.php';
 ?>
+<!-- Script para el captcha -->
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
 <a href="?controlador=usuario&accion=addUser">Registrarse</a>
 <div class="centrar">	
 	<div class="container cuerpo text-center">	
@@ -29,6 +32,12 @@ require_once 'vistas/includes/header.php';
 			</label>
 			<br/>
 
+			<!-- Captcha -->
+			<label for="captcha">Captcha: 
+				<div class="g-recaptcha" name= "captcha" data-sitekey="6Lef810gAAAAAChSMQBkS0o4FVLn7TE_Q_iwRo62"></div>
+			</label>
+			<br/>
+
 			<label><input type="checkbox" name="recordar" <?php
 				if (isset($_COOKIE['recordar'])) {
 					echo 'checked="true"';
@@ -46,7 +55,7 @@ require_once 'vistas/includes/header.php';
 			<?php
 			if (isset($_GET['error'])) {
 				if ($_GET['error'] == "credenciales") {
-					echo '<div class="alert alert-danger" style="margin-top:5px;">' . "Usuario o/y contraseña inválidos. Revise los datos. <br/>" . '</div>';
+					echo '<div class="alert alert-danger" style="margin-top:5px;">' . "Usuario o/y contraseña inválidos. Recuerde marcar el Captcha. <br/>" . '</div>';
 				} elseif ($_GET['error'] == "privadas") {
 					echo '<div class="alert alert-danger" style="margin-top:5px;">' . "Es necesario loguearse para acceder al resto de páginas del sitio.<br/>" . '</div>';
 				}
