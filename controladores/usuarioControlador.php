@@ -184,6 +184,7 @@ class UsuarioControlador {
 			$numeroUsuarios = $this->modeloUsuarios->getNumeroUsuarios();
 			$mensajeResultado = "";
 			$mensajeResultado2 = "";
+			$mensajeResultado3 = $_GET["resultado"];
 
 			if ($numeroUsuarios > 0) {
 
@@ -302,6 +303,200 @@ class UsuarioControlador {
 			die();
 		}
 		include_once 'vistas/usuario/detalle.php';
+	}
+
+	public function editUser() {
+
+		$idusuario = $_GET["id"];
+		$errores = array();
+		$mensajeResultado = "";
+
+		if (!isset($idusuario) || empty($idusuario) || !is_numeric($idusuario)) {
+			header("Location:index.php");
+		}
+
+		try {
+			$usuarioEditar = $this->modeloUsuarios->detalleUser($idusuario);
+
+			if ($usuarioEditar) {
+				$mensajeResultado = '<div class="alert alert-success">' .
+						"La consulta se realizó correctamente." . '</div>';
+			}
+
+			if (isset($_POST["submit"])) {
+
+				$nickname = filter_var($_POST["nickname"], FILTER_SANITIZE_STRING);
+				$nombre = filter_var($_POST["nombre"], FILTER_SANITIZE_STRING);
+				$apellidos = filter_var($_POST["apellidos"], FILTER_SANITIZE_STRING);
+				$email = filter_var($_POST["email"], FILTER_SANITIZE_EMAIL);
+				//$password = sha1($_POST['password']);
+				$imagen = null;
+
+				if (!empty($_POST["nickname"]) && strlen($_POST["nickname"]) <= 20
+				) {
+					$nickname_validate = true;
+				} else {
+					$nickname_validate = false;
+					$this->mensajes[] = [
+						"tipo" => "danger",
+						"mensaje" => "El nick introducido no es válido."
+					];
+					$errores["nickname"] = "El nick introducido no es válido.";
+				}
+
+				if (!empty($_POST["nombre"]) && strlen($_POST["nombre"]) <= 20 &&
+						!is_numeric($_POST["nombre"]) && !preg_match("/[0-9]/", $_POST["nombre"])
+				) {
+					$nombre_validate = true;
+				} else {
+					$nombre_validate = false;
+					$this->mensajes[] = [
+						"tipo" => "danger",
+						"mensaje" => "El nombre introducido no es válido."
+					];
+					$errores["nombre"] = "El nombre introducido no es válido.";
+				}
+
+				if (!empty($_POST["apellidos"]) && !is_numeric($_POST["apellidos"]) &&
+						!preg_match("/[0-9]/", $_POST["apellidos"])) {
+					$apellidos_validate = true;
+				} else {
+					$apellidos_validate = false;
+					$this->mensajes[] = [
+						"tipo" => "danger",
+						"mensaje" => "Los apellidos introducidos no son válidos."
+					];
+					$errores["apellidos"] = "Los apellidos introducidos no son válidos.";
+				}
+
+				if (!empty($_POST["password"]) && strlen($_POST["password"]) >= 6) {
+					$password_validate = true;
+					$password = sha1($_POST['password']); //sha1 se usa para encriptar , como seguridad
+				} elseif (empty($_POST["password"])) {
+					$password_validate = true;
+					$password = $usuarioEditar["password"];
+				} else {
+					$password_validate = false;
+					$this->mensajes[] = [
+						"tipo" => "danger",
+						"mensaje" => "La contraseña introducida no es válida."
+					];
+					$errores["password"] = "La contraseña introducida no es válida.";
+				}
+
+
+				if (!empty($_POST["email"]) && preg_match("/^\w+@[a-zA-Z]+\.[a-zA-Z]{2,3}$/", $_POST["email"])) {
+					$email_validate = true;
+				} else {
+					$email_validate = false;
+					$this->mensajes[] = [
+						"tipo" => "danger",
+						"mensaje" => "El correo introducido no es válido."
+					];
+					$errores["email"] = "El correo introducido no es válido.";
+				}
+
+				if (isset($_FILES["imagen"]) && !empty($_FILES["imagen"]["tmp_name"])) {
+
+					//Comprobamos si existe el directorio upload, sino existe lo creamos así.
+					if (!is_dir("uploads")) {
+						$dir = mkdir("uploads", 0777, true);
+					}//Si existe el directorio movemos el archivo a ese directorio.
+					else {
+						//Le pasamos el nombre por defecto y le concatenamos time() para que no
+						//sobreescriba el archivo si subimos una imagen con el mismo nombre.
+						$imagen = time() . " - " . $_FILES["imagen"]["name"];
+						//Con esto movemos el fichero que tenemos en la carpeta temporal a la ruta que especificamos.
+						$mover = move_uploaded_file($_FILES["imagen"]["tmp_name"], "uploads/" . $imagen);
+
+						if ($mover) {
+							$image_validate = true;
+						} else {
+							$image_validate = false;
+							$this->mensajes[] = [
+								"tipo" => "danger",
+								"mensaje" => "La imagen introducida no es válida."
+							];
+							$errores["imagen"] = "La imagen introducida no es válida.";
+						}
+					}
+				}
+
+				if (count($errores) == 0) {
+					$resultModelo = $this->modeloUsuarios->editUser([
+						'id' => $idusuario,
+						'nickname' => $nickname,
+						'nombre' => $nombre,
+						'apellidos' => $apellidos,
+						'password' => $password,
+						'email' => $email,
+						'imagen' => $imagen
+					]);
+
+					if ($resultModelo["correcto"]) {
+						$this->mensajes[] = [
+							"tipo" => "success",
+							"mensaje" => "REGISTRO ACTUALIZADO CORRECTAMENTE."
+						];
+					} else {
+						$this->mensajes[] = [
+							"tipo" => "danger",
+							"mensaje" => "ALGO SALIÓ MAL AL ACTUALIZAR <br/>({$resultModelo["error"]})"
+						];
+					}
+				} else {
+					$this->mensajes[] = [
+						"tipo" => "danger",
+						"mensaje" => "Datos de registro de usuario erróneos."
+					];
+				}
+			}
+		} catch (PDOException $ex) {
+			$mensajeResultado = '<div class="alert alert-danger">' .
+					"La consulta no se realizó correctamente." . '</div>';
+			die();
+		}
+
+		include_once 'vistas/usuario/edituser.php';
+	}
+
+	function mostrarErrores($errors, $campo) {
+		if (isset($errors[$campo]) && !empty($campo)) {
+			$alert = '<div class="alert alert-danger">' . $errors[$campo] . '</div>';
+		} else {
+			$alert = '';
+		}
+		return $alert;
+	}
+
+	function mantenerValores($datosUsuario, $campo, $textarea = false) {
+		if (isset($datosUsuario) && count($datosUsuario) > 0) {
+			if ($textarea == true) {
+				echo $datosUsuario[$campo];
+			} else {
+				echo "value='{$datosUsuario[$campo]}'";
+			}
+		}
+	}
+
+	public function deleteUser() {
+
+		$idusuario = $_GET["id"];
+
+		try {
+			$usuarioEliminar = $this->modeloUsuarios->deletetUser($idusuario);
+
+			if ($usuarioEliminar) {
+				$mensaje = '<div class="alert alert-success">' .
+						"Se eliminó correctamente." . '</div>';
+				header("Location:index.php?controlador=usuario&accion=listarUser&resultado={$mensaje}");
+			}
+		} catch (PDOException $ex) {
+			$mensaje = '<div class="alert alert-danger">' .
+					"No se pudo eliminar." . '</div>';
+			header("Location:index.php?controlador=usuario&accion=listarUser&resultado={$mensaje}");
+			die();
+		}
 	}
 
 }

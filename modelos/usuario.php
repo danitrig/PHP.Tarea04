@@ -98,31 +98,51 @@ class Usuario {
 	//Eliminar usuarios
 	public function deletetUser($id) {
 
-		$sql = "DELETE FROM usuarios WHERE idusuario=:idusuario";
+		$sql = "DELETE FROM usuarios WHERE id={$id}";
 		$query = $this->conexion->prepare($sql);
-		$query->execute(['idusuario' => $idusuario]);
-
+		$query->execute(['id' => $id]);
+		
 		return $query;
 	}
 
-	public function editUser($idusuario, $nombre, $apellidos, $biografia, $email, $password, $image) {
+	public function editUser($datos) {
 
-		$sql = "UPDATE usuarios SET nombre= :nombre, apellidos=:apellidos, biografia=:biografia, email= :email, password= :password,image= :image WHERE idusuario= :idusuario";
+		$return = [
+			"correcto" => FALSE,
+			"error" => NULL
+		];
 
-		//Preparación
-		$query = $conexion->prepare($sql);
-		//Ejecución
-		$query->execute([
-			'idusuario' => $idusuario,
-			'nombre' => $nombre,
-			'apellidos' => $apellidos,
-			'biografia' => $biografia,
-			'email' => $email,
-			'password' => $password,
-			'image' => $image
-		]);
+		try {
+			//Inicializamos la transacción
+			$this->conexion->beginTransaction();
+			//Definimos la instrucción SQL parametrizada 
+			$sql = "UPDATE usuarios SET nick= :nick, nombre= :nombre, apellidos=:apellidos, email= :email, password= :password,imagen= :imagen WHERE id= :id";
+			// Preparamos la consulta...
+			$query = $this->conexion->prepare($sql);
+			// y la ejecutamos indicando los valores que tendría cada parámetro
 
-		return $query;
+			$query->execute([
+				'id' => $datos["id"],
+				'nick' => $datos["nickname"],
+				'nombre' => $datos["nombre"],
+				'apellidos' => $datos["apellidos"],
+				'email' => $datos["email"],
+				'password' => $datos["password"],
+				'imagen' => $datos["imagen"]
+			]); //Supervisamos si la inserción se realizó correctamente... 
+
+			if ($query) {
+				$this->conexion->commit(); // commit() confirma los cambios realizados durante la transacción
+				$return["correcto"] = TRUE;
+				header("Location: index.php?controlador=usuario&accion=editUser&id={$datos["id"]}");
+			}// o no :(
+		} catch (PDOException $ex) {
+			$this->conexion->rollback(); // rollback() se revierten los cambios realizados durante la transacción
+			$return["error"] = $ex->getMessage();
+			//die();
+		}
+
+		return $return;
 	}
 
 	public function login($nick, $pass) {

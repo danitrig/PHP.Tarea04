@@ -15,8 +15,6 @@ if (!isset($_SESSION['logueado']) && (!isset($_COOKIE['mantener']))) {
 		$controlador = new UsuarioControlador();
 		$controlador->login();
 	}
-
-	
 } else {
 //Comprueba que la url recibe un controlador
 	if (isset($_GET['controlador'])) {
