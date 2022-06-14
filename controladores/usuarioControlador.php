@@ -184,7 +184,11 @@ class UsuarioControlador {
 			$numeroUsuarios = $this->modeloUsuarios->getNumeroUsuarios();
 			$mensajeResultado = "";
 			$mensajeResultado2 = "";
-			$mensajeResultado3 = $_GET["resultado"];
+			$mensajeResultado3 = "";
+
+			if (isset($_GET["resultado"])) {
+				$mensajeResultado3 = $_GET["resultado"];
+			}
 
 			if ($numeroUsuarios > 0) {
 

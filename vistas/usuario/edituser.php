@@ -16,8 +16,8 @@
 			<!-- Nick -->
 			<label for="nickname">Nick:
 				<input type="text" name="nickname" class="form-control" 
-
-					   <?php $this->mantenerValores($usuarioEditar, "nick") ?>/>
+					   <?php $this->mantenerValores($usuarioEditar, "nick") ?> 
+					   readonly/>
 					   <?php echo $this->mostrarErrores($errores, "nick"); ?>
 			</label>
 			</br>

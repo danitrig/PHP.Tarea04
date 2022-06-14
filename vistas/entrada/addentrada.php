@@ -31,18 +31,24 @@ require_once 'vistas/includes/header.php';
 		</select>    
 	</label>
     </br>
-	
+
 	<input id="prodId" name="prodId" type="hidden" value="xm234jq">
 
 	<!-- Descripción -->
     <label for="descripcion">Descripción:
-        <textarea name="descripcion" class="form-control"></textarea>
+        <textarea name="descripcion" id="descripcion"></textarea>
     </label>
     </br>
 
     <input type="submit" value="Enviar" name="submit" class="btn btn-success" />
-
-
 </form>
+
+<script>
+	ClassicEditor
+			.create(document.querySelector('#descripcion'))
+			.catch(error => {
+				console.error(error);
+			});
+</script>
 
 <?php require_once 'vistas/includes/footer.php' ?>
