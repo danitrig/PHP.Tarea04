@@ -130,4 +130,58 @@ class EntradaControlador {
 		include_once 'vistas/entrada/addentrada.php';
 	}
 
+	//Listar usuarios
+	public function listarEntradas() {
+
+		try {
+			$listaEntradas = $this->modeloEntrada->getEntrada();
+			$numeroEntradas = $this->modeloEntrada->getNumeroEntradas();
+			$orden = "DESC";
+			$mensajeResultado = "";
+			$mensajeResultado2 = "";
+			$mensajeResultado3 = "";
+
+			if (isset($_GET["resultado"])) {
+				$mensajeResultado3 = $_GET["resultado"];
+			}
+			if (isset($_GET["orden"])) {
+				$orden = $_GET["orden"];
+			}
+
+			if ($numeroEntradas > 0) {
+
+				$entradasPorPagina = 5; //Para no tener que introducir muchos usuarios y probar que funciona he puesto solo 5
+
+				if (isset($_GET["pagina"])) {
+					$pagina = $_GET["pagina"];
+				} else {
+					$pagina = 0;
+				}
+				//Si solo tiene una página
+				if ($pagina == 0) {
+					$start = 0;
+					$pagina = 1;
+				} else {
+					$start = ($pagina - 1) * $entradasPorPagina;
+				}
+				$paginasTotales = ceil($numeroEntradas / $entradasPorPagina);
+
+				$listaEntradas = $this->modeloEntrada->obtienePaginaEntradas($start, $entradasPorPagina,$orden);
+			} else {
+				$mensajeResultado2 = '<div class="alert alert-danger">' .
+						"Aún NO existe ninguna entrada" . '</div>';
+			}
+
+			if ($listaEntradas) {
+				$mensajeResultado = '<div class="alert alert-success">' .
+						"La consulta se realizó correctamente." . '</div>';
+			}
+		} catch (PDOException $ex) {
+			$mensajeResultado = '<div class="alert alert-danger">' .
+					"La consulta no se realizó correctamente." . '</div>';
+			die();
+		}
+		include_once 'vistas/entrada/listaentradas.php';
+	}
+
 }

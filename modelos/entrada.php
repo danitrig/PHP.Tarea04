@@ -91,25 +91,16 @@ class Entrada {
 		return $resultsquery;
 	}
 
-	public function getCategorias() {
-
-		$sql = "SELECT * FROM categorias";
-		// Ejecutamos (conexion es el nombre de la conexión a la base de datos)
-		$resultsquery = $this->conexion->query($sql);
-
-		return $resultsquery;
-	}
-
 	//Paginación
 	public function getNumeroEntradas() {
-		$numeroCategorias = $this->conexion->query("SELECT FOUND_ROWS() as total");
-		$numeroCategorias = $numeroCategorias->fetch()['total'];
+		$numeroEntradas = $this->conexion->query("SELECT FOUND_ROWS() as total");
+		$numeroEntradas = $numeroEntradas->fetch()['total'];
 
-		return $numeroCategorias;
+		return $numeroEntradas;
 	}
 
-	public function obtienePaginaEntradas($start, $categoriasPorPagina) {
-		$sql = "SELECT * FROM categorias order by id DESC LIMIT {$start}, {$categoriasPorPagina};";
+	public function obtienePaginaEntradas($start, $entradasPorPagina, $orden) {
+		$sql = "SELECT * FROM entradas order by id {$orden} LIMIT {$start}, {$entradasPorPagina};";
 		$resultsquery = $this->conexion->query($sql);
 
 		return $resultsquery;

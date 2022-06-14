@@ -5,7 +5,7 @@
 		<div class="container cuerpo text-left">
 			<p><h2><img class="alineadoTextoImagen" src= "images/user.png"width="50px"/>
 				Base de Datos de Usuarios</h2></p>
-			<a href="pdf.php" class="btn btn-primary">Imprimir PDF</a>
+				<a href="vistas/usuario/pdf.php" class="btn btn-primary">Imprimir PDF</a>
 		</div>
 		</br>
 		<?php echo $mensajeResultado ?>
